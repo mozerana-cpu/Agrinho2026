@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Agrinho 2026 - Café Sustentável</title>
+    <style>
+        :root {
+            --verde-agro: #2d5a27;
+            --marrom-terra: #4e342e;
+            --sustentavel: #8bc34a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f1;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background-color: var(--verde-agro);
+            color: white;
+            width: 100%;
+            text-align: center;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            max-width: 800px;
+            width: 90%;
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        #game-screen {
+            background-color: #e8f5e9;
+            height: 300px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 5rem;
+            margin-bottom: 20px;
+            border: 3px solid var(--marrom-terra);
+        }
+
+        .status-panel {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .stat-card {
+            background: #f1f8e9;
+            padding: 10px;
+            border-radius: 8px;
+            border-bottom: 4px solid var(--verde-agro);
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        button {
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-bio { background-color: var(--sustentavel); color: white; }
+        .btn-chem { background-color: #ff9800; color: white; }
+        .btn-sensor { background-color: #2196f3; color: white; }
+        .btn-reset { background-color: #f44336; color: white; grid-column: span 2; }
+
+        button:hover { opacity: 0.8; transform: scale(1.02); }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Simulador Café Sustentável ☕</h1>
+    <p>Agrinho 2026: Equilíbrio e Produção</p>
+</header>
+
+<div class="container">
+    <div id="game-screen">🌳</div>
+
+    <div class="status-panel">
+        <div class="stat-card">
+            <strong>Saúde da Planta</strong><br>
+            <span id="health">100</span>%
+        </div>
+        <div class="stat-card">
+            <strong>Sustentabilidade</strong><br>
+            <span id="eco">100</span> pts
+        </div>
+        <div class="stat-card">
+            <strong>Pragas</strong><br>
+            <span id="pests">Nenhuma</span>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button class="btn-bio" onclick="action('bio')">Controle Biológico (Vespas)</button>
+        <button class="btn-chem" onclick="action('chem')">Defensivo Químico</button>
+        <button class="btn-sensor" onclick="action('sensor')">Usar Drones/IA</button>
+        <button class="btn-reset" onclick="resetGame()">Reiniciar Safra</button>
+    </div>
+
+    <div id="log" style="margin-top: 20px; font-style: italic; color: #666;">
+        Bem-vinda, produtora! Monitore seu cafezal.
+    </div>
+</div>
+
+<script>
+    let health = 100;
+    let eco = 100;
+    let pestActive = false;
+
+    // Simula o surgimento de pragas a cada 5 segundos
+    setInterval(() => {
+        if (!pestActive && Math.random() > 0.7) {
+            pestActive = true;
+            document.getElementById('pests').innerText = "BROCA DETECTADA!";
+            document.getElementById('game-screen').innerText = "🐛";
+            updateLog("Alerta: A Broca-do-café apareceu!");
+        }
+        
+        if (pestActive) {
+            health = Math.max(0, health - 5);
+            updateDisplay();
+        }
+    }, 3000);
+
+    function action(type) {
+        if (type === 'bio') {
+            if (pestActive) {
+                pestActive = false;
+                eco += 10;
+                updateLog("Você usou vespas! Praga controlada de forma natural.");
+            } else {
+                updateLog("Não há pragas no momento.");
+            }
+        } else if (type === 'chem') {
+            if (pestActive) {
+                pestActive = false;
+                eco -= 20;
+                updateLog("Fungicida aplicado. Praga morreu, mas a pontuação ecológica caiu.");
+            }
+        } else if (type === 'sensor') {
+            updateLog("Drones detectaram que o solo está perfeito!");
+            eco += 5;
+        }
+        
+        if (!pestActive) document.getElementById('game-screen').innerText = "🌳";
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        document.getElementById('health').innerText = health;
+        document.getElementById('eco').innerText = eco;
+        if (!pestActive) document.getElementById('pests').innerText = "Nenhuma";
+        
+        if (health <= 0) {
+            document.getElementById('game-screen').innerText = "🍂";
+            updateLog("Safra perdida! Tente novamente com mais equilíbrio.");
+        }
+    }
+
+    function updateLog(msg) {
+        document.getElementById('log').innerText = msg;
+    }
+
+    function resetGame() {
+        health = 100; eco = 100; pestActive = false;
+        document.getElementById('game-screen').innerText = "🌳";
+        updateDisplay();
+        updateLog("Nova safra iniciada!");
+    }
+</script>
+
+</body>
+</html>
